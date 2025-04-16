@@ -22,31 +22,31 @@ export const PeopleCard: React.FC<PeopleCardProps> = ({
   return (
     <Card 
       className="finno-card overflow-hidden h-full"
-      style={{ borderColor: people.color, borderWidth: "2px" }}
+      style={{ borderTopColor: people.color }}
     >
       <CardHeader 
-        className="pb-2" 
+        className="pb-3" 
         style={{ backgroundColor: `${people.color}10` }}
       >
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-xl md:text-2xl">
-            {people.name}
-          </CardTitle>
-          {!compact && (
-            <Badge 
-              style={{ backgroundColor: people.color }}
-              className="ml-2"
-            >
-              {group?.name}
-            </Badge>
-          )}
+        <div className="flex justify-between items-start">
+          <div>
+            <CardTitle className="text-xl md:text-2xl">
+              {people.name}
+            </CardTitle>
+            <p className="text-sm italic text-muted-foreground">{people.nativeName}</p>
+          </div>
+          <Badge 
+            style={{ backgroundColor: people.color }}
+            className="ml-2 shrink-0"
+          >
+            {group?.name}
+          </Badge>
         </div>
-        <p className="text-sm italic text-muted-foreground">{people.nativeName}</p>
       </CardHeader>
       
       <CardContent className="pt-4 space-y-4">
         {!compact && (
-          <div className="w-full h-40 bg-muted rounded-md overflow-hidden relative">
+          <div className="w-full h-36 bg-muted rounded-md overflow-hidden relative">
             <img 
               src={people.imageUrl || "/placeholder.svg"} 
               alt={people.name}

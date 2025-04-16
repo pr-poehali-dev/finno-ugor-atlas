@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { MoonIcon, SunIcon, MenuIcon } from "lucide-react";
 import {
@@ -21,15 +21,29 @@ type HeaderProps = {
 };
 
 export const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode }) => {
+  const location = useLocation();
+  const [isScrolled, setIsScrolled] = useState(false);
+  
+  // Обработка скролла для изменения стиля хедера
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const navItems = [
     { title: "Главная", path: "/" },
-    { title: "Народы", path: "/peoples" },
-    { title: "Карта", path: "/map" },
+    { title: "Атлас народов", path: "/atlas" },
     { title: "О проекте", path: "/about" },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur">
+    <header className={`sticky top-0 z-50 w-full border-b backdrop-blur transition-all ${
+      isScrolled ? 'bg-background/95 shadow-sm' : 'bg-background/50'
+    }`}>
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
           <Link to="/" className="flex items-center gap-2">
@@ -41,16 +55,22 @@ export const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode }) =>
         </div>
 
         {/* Навигация для десктопа */}
-        <nav className="hidden md:flex items-center gap-6">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className="text-sm font-medium hover:text-primary transition-colors"
-            >
-              {item.title}
-            </Link>
-          ))}
+        <nav className="hidden md:flex items-center gap-8">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path || 
+                            (item.path === '/atlas' && location.pathname.startsWith('/atlas/'));
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  isActive ? 'text-primary' : 'text-muted-foreground'
+                }`}
+              >
+                {item.title}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-2">
@@ -84,16 +104,22 @@ export const Header: React.FC<HeaderProps> = ({ isDarkMode, toggleDarkMode }) =>
             </SheetTrigger>
             <SheetContent>
               <nav className="flex flex-col gap-4 mt-8">
-                {navItems.map((item) => (
-                  <SheetClose asChild key={item.path}>
-                    <Link
-                      to={item.path}
-                      className="text-lg font-medium hover:text-primary transition-colors py-2 border-b"
-                    >
-                      {item.title}
-                    </Link>
-                  </SheetClose>
-                ))}
+                {navItems.map((item) => {
+                  const isActive = location.pathname === item.path || 
+                                  (item.path === '/atlas' && location.pathname.startsWith('/atlas/'));
+                  return (
+                    <SheetClose asChild key={item.path}>
+                      <Link
+                        to={item.path}
+                        className={`text-lg font-medium py-2 border-b ${
+                          isActive ? 'text-primary border-primary' : 'text-foreground border-muted'
+                        }`}
+                      >
+                        {item.title}
+                      </Link>
+                    </SheetClose>
+                  );
+                })}
               </nav>
             </SheetContent>
           </Sheet>
