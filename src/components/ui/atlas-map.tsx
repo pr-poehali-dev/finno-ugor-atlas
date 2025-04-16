@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { motion } from "framer-motion";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 type Location = {
   id: string;
@@ -47,13 +46,16 @@ export const AtlasMap: React.FC<AtlasMapProps> = ({
           const isHovered = hoveredLocation === location.id;
           
           // Размер точки зависит от размера популяции
-          const size = Math.max(8, Math.min(20, 8 + location.population / 10000));
+          const baseSize = Math.max(8, Math.min(20, 8 + location.population / 10000));
+          const size = isSelected || isHovered ? baseSize * 1.3 : baseSize;
           
           // Цвет в зависимости от группы народов
           let color = "#4C6D97"; // По умолчанию синий
           if (location.group === "ugric") color = "#5B8C71"; // Зеленый для угорских
           if (location.group === "permian") color = "#E5864E"; // Оранжевый для пермских
           if (location.group === "volga") color = "#D45B5B"; // Красный для волжских
+          
+          const opacity = isSelected || isHovered ? 1 : 0.8;
           
           return (
             <g 
@@ -63,24 +65,20 @@ export const AtlasMap: React.FC<AtlasMapProps> = ({
               onMouseLeave={() => setHoveredLocation(null)}
               className="finno-map-point"
             >
-              <motion.circle
+              <circle
                 cx={location.x}
                 cy={location.y}
                 r={size}
                 fill={color}
-                initial={{ opacity: 0.8 }}
-                animate={{ 
-                  r: isSelected || isHovered ? size * 1.3 : size,
-                  opacity: isSelected || isHovered ? 1 : 0.8 
-                }}
-                transition={{ duration: 0.3 }}
+                opacity={opacity}
+                className="transition-all duration-300"
               />
               
               {isSelected && (
                 <circle
                   cx={location.x}
                   cy={location.y}
-                  r={size + 10}
+                  r={baseSize + 10}
                   fill="none"
                   stroke={color}
                   strokeWidth="2"
@@ -93,7 +91,7 @@ export const AtlasMap: React.FC<AtlasMapProps> = ({
                   <circle
                     cx={location.x}
                     cy={location.y}
-                    r={size + 5}
+                    r={baseSize + 5}
                     fill="transparent"
                     className="cursor-pointer"
                   />
